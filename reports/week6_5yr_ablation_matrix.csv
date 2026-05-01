@@ -1,0 +1,3 @@
+strategy,backtest_scope_yr,vanilla_sharpe,vanilla_ci_low,vanilla_ci_high,IV_percentile_sharpe,IV_percentile_ci_low,IV_percentile_ci_high,HMM_sharpe,HMM_ci_low,HMM_ci_high,gate_alpha_evidence
+IronCondor,5yr,-2.7047330884047085,-1.4640447834073913,0.15486449484530987,-2.680334826630811,-1.3748112905571805,0.23541847103632496,0.0,,,inconclusive (CI 重疊或數據不足)
+Vertical,5yr,-2.146276315005466,-1.9690451226056211,-0.25141388478103877,-2.124896864429521,-1.8084980343211867,-0.13058815742739593,-2.8599378307643786,-0.7889275476818892,1.0928884942473365,inconclusive (CI 重疊或數據不足)

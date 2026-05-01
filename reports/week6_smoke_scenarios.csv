@@ -1,0 +1,7 @@
+scenario,strategy,regime_gate,backtest_scope_yr,backtest_start,backtest_end,train_window_days,test_window_days,step_days,n_folds_total,n_folds_failed,agg_sharpe,bootstrap_ci_low,bootstrap_ci_high,permutation_p_value,deflated_sharpe,agg_max_drawdown,calmar_ratio,total_trades,n_observations,n_fallback_surface_total,n_fallback_settle_total,n_fallback_settle_3rd_total,settle_3rd_fallback_ratio,fallback_legs_ratio,avg_fallback_rate,cost_model_disabled
+IC_vanilla,IronCondor,vanilla,smoke,2024-04-01,2025-04-01,63,21,21,8,0,-2.2044174848117186,-2.272933875611148,2.02671592410177,0.7422577422577422,2.2446660125898983e-132,-0.0094125,-1.282868525896414,1,168,0.0,0.0,0.0,0.0,0.0,0.0,True
+IC_IV_percentile,IronCondor,IV_percentile,smoke,2024-04-01,2025-04-01,63,21,21,8,0,-2.2044174848117186,-2.272933875611148,2.02671592410177,0.7422577422577422,2.2446660125898983e-132,-0.0094125,-1.282868525896414,1,168,0.0,0.0,0.0,0.0,0.0,0.0,True
+IC_HMM,IronCondor,HMM,smoke,2024-04-01,2025-04-01,63,21,21,8,0,0.0,,,1.0,1.1893114916512027e-63,0.0,,0,168,0.0,0.0,0.0,,,0.0,True
+Vertical_vanilla,Vertical,vanilla,smoke,2024-04-01,2025-04-01,63,21,21,8,0,0.0,,,1.0,1.1893114916512027e-63,0.0,,0,168,0.0,0.0,0.0,,,0.0,True
+Vertical_IV_percentile,Vertical,IV_percentile,smoke,2024-04-01,2025-04-01,63,21,21,8,0,0.0,,,1.0,1.1893114916512027e-63,0.0,,0,168,0.0,0.0,0.0,,,0.0,True
+Vertical_HMM,Vertical,HMM,smoke,2024-04-01,2025-04-01,63,21,21,8,0,0.0,,,1.0,1.1893114916512027e-63,0.0,,0,168,0.0,0.0,0.0,,,0.0,True

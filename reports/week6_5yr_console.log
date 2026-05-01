@@ -1,0 +1,69 @@
+
+======================================================================
+Step 1: load chain + TAIEX spot 2021-04-01 → 2026-04-28
+======================================================================
+  filtered 5,334 post-expiry rows
+  chain: 909,938 rows / 1227 dates / 9.9s
+  TAIEX spot (window): 1231 days
+  TAIEX returns (with 900-day buffer): 1826 returns
+
+======================================================================
+Step 2: enrich_pipeline + add_model_price + surface coverage gate
+======================================================================
+  surface_records loaded: 6134
+  enriched 909,938 rows / IV fill 86.7% / model_price fill 98.5% / 919.4s
+  surface coverage: 100.0% (1227/1227 dates)
+  danger_rows (NaN bid/ask AND NaN model_price): 8,073 / 909,938
+  truly_unmarkable (also NaN settle, R12.4 Tier 2 gate): 0
+  settle_3rd_fallback rows (R12.5 separate metric): 8,073 = 0.89%
+  [INFO] 8,073 2-layer-miss rows (mid+surface NaN) will fall back to settle (3rd layer; R12.4). Settle ~= 0 for far-OTM worthless strikes is institutionally correct mark.
+
+======================================================================
+Scenario IC_vanilla  (IronCondor × vanilla)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.705 / 3.9s
+
+======================================================================
+Scenario IC_IV_percentile  (IronCondor × IV_percentile)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.680 / 3.6s
+
+======================================================================
+Scenario IC_HMM  (IronCondor × HMM)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=0.000 / 142.4s
+
+======================================================================
+Scenario Vertical_vanilla  (Vertical × vanilla)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.146 / 4.8s
+
+======================================================================
+Scenario Vertical_IV_percentile  (Vertical × IV_percentile)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.125 / 4.4s
+
+======================================================================
+Scenario Vertical_HMM  (Vertical × HMM)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.860 / 8.3s
+
+======================================================================
+Step 5: cross-scenario divergence + regime ablation
+======================================================================
+  scenario divergence keys: 30
+
+======================================================================
+Step 6: write reports/
+======================================================================
+  week6_5yr_folds.csv: 90 rows
+  week6_5yr_scenarios.csv: 6 rows
+  week6_5yr_daily_pnl.csv: 5670 rows
+  week6_5yr_rejected_reasons.csv: 0 rows
+  week6_5yr_ablation_matrix.csv: 2 rows
+  week6_5yr_monitor_metrics.json: written
+  HMM convergence warnings (R12.10 caveat tracking): 792
+  week6_5yr_run_meta.json: written
+  week6_5yr_summary.md: written
+
+DONE. Total 1097.6s.

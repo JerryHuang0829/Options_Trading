@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Test
+.pytest_cache/
+.pytest_tmp/
+tests/_tmp/
+.coverage
+
+# Codex / tmp dirs at repo root (R11.19 P2 教訓: 干擾 grep / Pattern 18 doc drift sweep)
+.codex_tmp/
+tmp[0-9a-z]*/
+tmp[0-9a-z]*
+
+# OS
+.DS_Store
+Thumbs.db
+pytest-cache-files-*/
+
+# TAIFEX raw cache (Phase 1 Week 3 Pre-1)
+# raw ZIP / unzipped CSV — large binary, rebuild via taifex_loader.backfill_range
+data/taifex_cache/raw_zip/
+data/taifex_cache/raw_unzipped/
+
+# Large derived caches (~200 MB total) — rebuild via taifex_loader /
+# surface fit pipeline (scripts/_validate_surface_mark_5_4a.py)
+data/taifex_cache/raw/
+data/taifex_cache/strategy_view/
+data/taifex_cache/surface_fits/
+data/taifex_cache/_extract_tmp/
+data/taifex_cache/_backfill_manifest.csv
+
+# 5yr backtest large reports (rebuild via scripts/_validate_week6_5yr.py)
+# Keep scenarios.csv / summary.md / monitor_metrics.json for reference;
+# ignore daily_pnl.csv (5670 rows, 432K) + day_5_4* (Day 5.4 historical)
+reports/week6_5yr_daily_pnl.csv
+reports/week6_5yr_no_cost/daily_pnl.csv
+reports/day_5_4*
+
+# Backtest outputs
+outputs/
+
+# Local TAIEX OHLC (regenerate via scripts/fetch_taiex.py if needed)
+# data/taiex_daily.csv  ← Pre-2 完成後再決定 git track 與否（~50KB）

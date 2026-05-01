@@ -1,0 +1,3 @@
+strategy,backtest_scope_yr,vanilla_sharpe,vanilla_ci_low,vanilla_ci_high,IV_percentile_sharpe,IV_percentile_ci_low,IV_percentile_ci_high,HMM_sharpe,HMM_ci_low,HMM_ci_high,gate_alpha_evidence
+IronCondor,smoke,-2.2044174848117186,-2.272933875611148,2.02671592410177,-2.2044174848117186,-2.272933875611148,2.02671592410177,0.0,,,inconclusive (CI 重疊或數據不足)
+Vertical,smoke,0.0,,,0.0,,,0.0,,,inconclusive (CI 重疊或數據不足)

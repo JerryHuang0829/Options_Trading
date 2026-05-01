@@ -1,0 +1,58 @@
+{
+  "script": "_validate_week6_5yr.py",
+  "scope": "5yr",
+  "start_date": "2021-04-01",
+  "end_date": "2026-04-28",
+  "initial_capital": 1000000.0,
+  "started_at_utc": "2026-05-01T16:37:04.826421+00:00",
+  "phase_durations_sec": {
+    "step1_load": 9.89,
+    "step2_enrich": 919.41
+  },
+  "scenarios_run": [
+    {
+      "scenario": "IC_vanilla",
+      "duration_sec": 3.89,
+      "n_folds": 15
+    },
+    {
+      "scenario": "IC_IV_percentile",
+      "duration_sec": 3.57,
+      "n_folds": 15
+    },
+    {
+      "scenario": "IC_HMM",
+      "duration_sec": 142.42,
+      "n_folds": 15
+    },
+    {
+      "scenario": "Vertical_vanilla",
+      "duration_sec": 4.82,
+      "n_folds": 15
+    },
+    {
+      "scenario": "Vertical_IV_percentile",
+      "duration_sec": 4.39,
+      "n_folds": 15
+    },
+    {
+      "scenario": "Vertical_HMM",
+      "duration_sec": 8.26,
+      "n_folds": 15
+    }
+  ],
+  "codex_audits_applied": [
+    "R12.0 P1-P4b",
+    "R12.1 caveats 1-4",
+    "R12.2-R12.9 P all closed"
+  ],
+  "chain_n_rows_filtered_postexpiry": 5334,
+  "chain_n_rows": 909938,
+  "chain_n_dates": 1227,
+  "underlying_returns_with_buffer": 1826,
+  "iv_fill_rate": 0.8667491631297957,
+  "model_price_fill_rate": 0.9847418175743842,
+  "cost_model_disabled": false,
+  "total_duration_sec": 1097.58,
+  "hmm_convergence_warnings_count": 792
+}

@@ -1,0 +1,64 @@
+
+======================================================================
+Step 1: load chain + TAIEX spot 2024-04-01 → 2025-04-01
+======================================================================
+  chain: 201,552 rows / 242 dates / 2.9s
+  TAIEX spot (window): 242 days
+  TAIEX returns (with 900-day buffer): 838 returns
+
+======================================================================
+Step 2: enrich_pipeline + add_model_price + surface coverage gate
+======================================================================
+  surface_records loaded: 1210
+  enriched 201,552 rows / IV fill 85.6% / model_price fill 98.5% / 241.6s
+  [diagnostic] --no-cost-model: cost_model=None (Sharpe is upper bound)
+
+======================================================================
+Scenario IC_vanilla  (IronCondor × vanilla)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=-2.204 / 0.7s
+
+======================================================================
+Scenario IC_IV_percentile  (IronCondor × IV_percentile)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=-2.204 / 0.9s
+
+======================================================================
+Scenario IC_HMM  (IronCondor × HMM)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=0.000 / 41.4s
+
+======================================================================
+Scenario Vertical_vanilla  (Vertical × vanilla)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=0.000 / 0.6s
+
+======================================================================
+Scenario Vertical_IV_percentile  (Vertical × IV_percentile)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=0.000 / 0.4s
+
+======================================================================
+Scenario Vertical_HMM  (Vertical × HMM)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=0.000 / 0.4s
+
+======================================================================
+Step 5: cross-scenario divergence + regime ablation
+======================================================================
+  scenario divergence keys: 30
+
+======================================================================
+Step 6: write reports/
+======================================================================
+  week6_smoke_folds.csv: 48 rows
+  week6_smoke_scenarios.csv: 6 rows
+  week6_smoke_daily_pnl.csv: 1008 rows
+  week6_smoke_rejected_reasons.csv: 0 rows
+  week6_smoke_ablation_matrix.csv: 2 rows
+  week6_smoke_monitor_metrics.json: written
+  HMM convergence warnings (R12.10 caveat tracking): 45
+  week6_smoke_run_meta.json: written
+  week6_smoke_summary.md: written
+
+DONE. Total 289.4s.

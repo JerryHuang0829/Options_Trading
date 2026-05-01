@@ -1,0 +1,99 @@
+[project]
+name = "options-trading"
+version = "0.1.0"
+description = "TXO Iron Condor + Vertical spread research (Phase 1); Calendar + Shioaji live trading (Phase 2)."
+requires-python = ">=3.12"
+readme = "README.md"
+
+# ---------- pytest ----------
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    ".pytest_tmp",
+    "pytest-cache-files-*",
+    ".venv",
+    "notebooks",
+    ".ipynb_checkpoints",
+]
+# R11.3 P1 修法 (廢 R11.1 basetemp + R11.2 sessionfinish 嘗試):
+# 根本解 — tests/conftest.py override pytest 內建 tmp_path fixture 用
+# tempfile.TemporaryDirectory + shutil.rmtree(ignore_errors=True). pytest 不再
+# 自己管 tmpdir cleanup → 不會 raise WinError 5 PermissionError.
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: deselect with -m 'not slow'",
+    "integration: requires external data / network",
+]
+
+# ---------- ruff ----------
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [
+    "notebooks",
+    ".venv",
+    # Pytest tmpdir variants — Windows AV 鎖檔留下殘留目錄；glob 寬鬆排掉
+    # (R11.3 P2 真實列出: .pytest_tmp_r11_isolated/.tmp_pytest_env 等)
+    # R11.4 P1 終極：tmp 落 tests/_tmp/ repo 內目錄 (見 tests/conftest.py)
+    ".pytest_tmp",
+    ".pytest_tmp_*",
+    ".pytest_cache",
+    ".tmp_pytest_*",
+    "_tmp_*",
+    "tests/_tmp",
+    "tests/_tmp/*",
+    "data/taifex_cache/_extract_tmp",
+    "data/taifex_cache/_extract_tmp/*",
+    "**/taifex_*_*",  # backfill_range tempdir naming pattern
+    # R11.5 P 修：repo root audit / manifest_schema 隔離測試殘留 dir 也排除
+    "audit_*",
+    "manifest_schema_*",
+]
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, I isort, N pep8-naming, UP pyupgrade,
+# B bugbear, A builtins, SIM simplify, RET return, NPY numpy-specific, PD pandas
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM", "RET", "NPY", "PD"]
+ignore = [
+    "E501",    # line length handled by formatter
+    "PD011",   # allow .values (common in numpy-land)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["N802", "N803", "N806"]          # tests use BSM naming for inputs / locals
+"src/options/pricing.py" = ["N803", "N806"]    # BSM convention: S, K, T uppercase (Black-Scholes 1973)
+"src/options/greeks.py" = ["N803", "N806"]     # BSM convention: S, K, T uppercase
+"src/options/vol_surface.py" = ["N803", "N806"]  # SVI/SABR convention: T, F (forward) uppercase
+"src/options/surface_batch.py" = ["N806"]      # BSM convention: T uppercase (years to expiry)
+"src/backtest/stats.py" = ["N803"]             # López-de-Prado convention: T (sample size) uppercase
+"src/options/regime_gate.py" = ["N806"]        # ML convention: X (feature matrix) uppercase
+"src/data/synthetic.py" = ["N806"]             # BSM-derived: T = dte / 365 follows convention
+"src/data/enrich.py" = ["N806"]                # BSM convention: S, K, T, C, P uppercase (q PIT solver / IV per-strike)
+"src/backtest/portfolio.py" = ["N806"]         # BSM convention in aggregate_greeks: S, K, T uppercase
+"scripts/stress_test.py" = ["N806"]            # BSM convention in shock_chain: S, K, T uppercase
+
+# ---------- mypy ----------
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests", "config", "scripts"]
+exclude = [
+    "^pytest-cache-files-",
+    "^notebooks/",
+    "^\\.venv/",
+    "^\\.pytest_cache/",
+    "^\\.pytest_tmp",
+    "^tests/_tmp/",
+]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+# Phase 1: loose — stubs use NotImplementedError and dataclass hints only.
+# Tighten to strict = true once actual logic lands in Phase 1 Week 2+.
+disallow_untyped_defs = false
+check_untyped_defs = true

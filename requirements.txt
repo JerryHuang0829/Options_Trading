@@ -1,0 +1,29 @@
+# Core scientific
+numpy>=1.26,<3
+pandas>=2.2
+scipy>=1.11
+
+# Options pricing
+py_vollib>=1.0.1
+
+# Testing
+pytest>=8.0
+pytest-cov>=5.0
+
+# Data I/O
+pyarrow>=15.0
+requests>=2.31
+python-dotenv>=1.0
+holidays>=0.50,<1.0  # TXO 月選結算 = 第3週三+順延，holidays.TW 提供台灣假日；R11.6 P1 修法 (Codex 抓乾淨環境 import error)
+
+# Reporting & exploration
+matplotlib>=3.8
+ipykernel>=6.29   # VSCode native notebook 後端；不裝 `jupyter` meta-package（Windows MAX_PATH 問題 + 用不到瀏覽器 UI）
+
+# Dev tooling (code quality + interview signal)
+ruff>=0.6
+mypy>=1.11
+pandas-stubs>=2.2  # 讓 mypy 對 pandas 可辨識
+
+# Phase 2 (uncomment when integrating live trading)
+# shioaji>=1.2.0
