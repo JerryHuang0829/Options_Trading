@@ -365,7 +365,11 @@ def _aggregate_folds(folds: list[FoldResult], initial_capital: float) -> Aggrega
         from src.backtest.metrics import max_drawdown, sharpe_ratio
 
         agg_metrics["sharpe"] = sharpe_ratio(agg_pnl, initial_capital=initial_capital)
-        agg_metrics["max_drawdown"] = max_drawdown(agg_pnl, initial_capital=initial_capital)
+        # max_drawdown contract requires cumulative PnL (see metrics.py docstring).
+        # engine.run_backtest passes daily_pnl_series.cumsum(); mirror that here.
+        agg_metrics["max_drawdown"] = max_drawdown(
+            agg_pnl.cumsum(), initial_capital=initial_capital
+        )
         agg_metrics["n_observations"] = float(len(agg_pnl))
     else:
         agg_metrics["sharpe"] = float("nan")

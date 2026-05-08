@@ -1,0 +1,12 @@
+# Options_Trading Streamlit dashboard 設定
+#
+# Port 鎖定 8502，避免與其他 Streamlit 專案（如 Stock-Trading 預設 8501）
+# 同時運行時衝突。reviewer clone 後直接 `streamlit run dashboard/專案背景.py`
+# 即固定打開 http://localhost:8502。
+
+[server]
+port = 8502
+headless = false
+
+[browser]
+gatherUsageStats = false

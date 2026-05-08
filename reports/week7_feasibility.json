@@ -1,0 +1,74 @@
+{
+  "audit_window": {
+    "start": "2021-04-01",
+    "end": "2026-04-28"
+  },
+  "cohort_availability_full_range": {
+    "n_trading_days": 1227,
+    "mean_unique_expiry_per_day": 1.4376528117359413,
+    "median_unique_expiry_per_day": 1.0,
+    "p10_unique_expiry_per_day": 1.0,
+    "p90_unique_expiry_per_day": 2.0,
+    "max_unique_expiry_per_day": 2,
+    "pct_days_ge_3": 0.0,
+    "pct_days_ge_4": 0.0,
+    "pct_days_ge_5": 0.0
+  },
+  "cohort_availability_5yr": {
+    "n_trading_days": 1227,
+    "mean_unique_expiry_per_day": 1.4376528117359413,
+    "median_unique_expiry_per_day": 1.0,
+    "p10_unique_expiry_per_day": 1.0,
+    "p90_unique_expiry_per_day": 2.0,
+    "max_unique_expiry_per_day": 2,
+    "pct_days_ge_3": 0.0,
+    "pct_days_ge_4": 0.0,
+    "pct_days_ge_5": 0.0
+  },
+  "weekly_presence_full_range": {
+    "n_unique_short_dte_expiries": 61,
+    "n_total_unique_expiries": 67,
+    "weekly_density_ratio": 0.9104477611940298
+  },
+  "weekly_presence_5yr": {
+    "n_unique_short_dte_expiries": 61,
+    "n_total_unique_expiries": 67,
+    "weekly_density_ratio": 0.9104477611940298
+  },
+  "hedge_cost": {
+    "n_sampled_dates": 30,
+    "n_skipped": 19,
+    "skipped_reasons_sample": [
+      "2021-12-03T00:00:00.000000: no front DTE 25-35",
+      "2021-04-01T00:00:00.000000: no front DTE 25-35",
+      "2025-06-05T00:00:00.000000: no front DTE 25-35",
+      "2022-08-16T00:00:00.000000: no front DTE 25-35",
+      "2025-10-03T00:00:00.000000: no front DTE 25-35"
+    ],
+    "calendar_mode": {
+      "n": 10,
+      "median": 1.3482205903121027,
+      "mean": 1.497457626701457,
+      "p10": 0.8468189633996561,
+      "p90": 2.005093884628932
+    },
+    "straddle_mode": {
+      "n": 11,
+      "median": 8.356164383561644,
+      "mean": 8.249529335391301,
+      "p10": 7.608247422680412,
+      "p90": 9.173652694610778
+    }
+  },
+  "surface_coverage": {
+    "n_chain_trading_days": 1227,
+    "n_surface_fit_dates": 1227,
+    "n_overlap": 1227,
+    "coverage_pct": 1.0
+  },
+  "decision": {
+    "verdict": "GO 1-cohort \u7d14 D",
+    "reason": "mean 1.44 viable, p10 1.00 only supports 1 cohort",
+    "path": "Day 7.1+ single-expiry hedged IC (no E ladder)"
+  }
+}

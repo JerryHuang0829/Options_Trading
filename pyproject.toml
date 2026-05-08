@@ -76,6 +76,7 @@ ignore = [
 "src/data/enrich.py" = ["N806"]                # BSM convention: S, K, T, C, P uppercase (q PIT solver / IV per-strike)
 "src/backtest/portfolio.py" = ["N806"]         # BSM convention in aggregate_greeks: S, K, T uppercase
 "scripts/stress_test.py" = ["N806"]            # BSM convention in shock_chain: S, K, T uppercase
+"dashboard/**" = ["N803", "N806", "N816"]      # BSM convention: S, K, T uppercase; Streamlit page module-level slider state can use mixedCase
 
 # ---------- mypy ----------
 

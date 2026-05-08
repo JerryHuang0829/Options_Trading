@@ -1,95 +1,192 @@
 # Options_Trading
 
-中頻系統化期權（options）研究專案，主攻**台指選擇權（TXO）Iron Condor（鐵兀鷹）+ Vertical spread** 策略 + 5yr OOS walk-forward 驗證 + Pro 量化統計工具鏈.
+台灣期交所 TAIFEX TXO（台指選擇權）系統化策略研究框架，以 Iron Condor（鐵兀鷹）與 Vertical Spread（垂直價差）為主，透過 5 年真實市場資料的 walk-forward（滾動前進）回測進行驗證。
 
-> **Status (2026-05-02)**: **Phase 1 完工** — 工程 tooling **GO**, strategy alpha hypothesis **NO-GO**. 詳 [docs/phase1_conclusion.md](docs/phase1_conclusion.md).
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Tests](https://img.shields.io/badge/tests-465%20passed-brightgreen)
+![Type Check](https://img.shields.io/badge/mypy-passing-brightgreen)
+![Lint](https://img.shields.io/badge/ruff-passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-## 專案定位
+## 核心能力
 
-| 面向 | 內容 |
-|------|------|
-| 研究目標 | 自主操盤實戰 + Buy-side quant 求職雙軌 |
-| Phase 1（已完工）| IC + Vertical / TAIFEX 5yr walk-forward / 自寫 BSM-Merton / Pro 統計（Bootstrap CI / sign-flip permutation / Deflated Sharpe / Calmar）|
-| Phase 1 結論 | 5yr OOS Sharpe 全 negative (-2.1 ~ -2.9), HMM gate 0-1 trades. **alpha hypothesis 證偽, 不進 paper trading**. |
-| Phase 2（規劃中）| 三選一：(A) Stock factor model / (B) Long premium / vol arb / (C) Event-driven IV crush. 待 user 拍板 |
+- **自寫 Black-Scholes-Merton（BSM-Merton）定價核心**（含連續股利率 `q`）+ 5 個 Greeks（Δ Γ Θ ν ρ）+ Newton-Raphson IV solver（隱含波動率求解器）+ Brent fallback。對 50 random sample 用 `py_vollib.black_scholes_merton` 交叉驗證，價格差距 < 1e-8；4 種單位換算規則對齊（vega per 1.0 vs per 1%、theta per-day-365、rho per 1%）。
 
-## 技術棧
+- **8 年 TAIFEX TXO 資料管線**（2018-04 → 2026-04，1963 個交易日）— Big5 / CP950 編碼、3 種 schema 自動偵測（OLDEST 18 欄 / PRE 20 欄 / POST 21 欄）、parquet 雙層 cache（raw + strategy_view）、ZIP magic-bytes 守衛、annual 與 daily 兩種下載模式。
 
-- **語言**：Python 3.12 (conda `options` env, conda-forge channel)
-- **定價核心**：自寫 BSM-Merton (含股利 q) + 5 Greeks；`py_vollib.black_scholes_merton` 作 pytest reference (4 規則單位換算)
-- **波動率曲面**：SVI / SABR / poly fit + arb-free check, 1227 shards 跨 2021-2026 5yr full coverage
-- **資料**：TAIFEX 每日 option chain (1963 days raw / strategy_view); TAIEX spot for regime gate
-- **回測**：walk-forward backtest (252-day train / 63-day disjoint OOS quarterly), 6 scenario (IC / Vertical × vanilla / IV-percentile / HMM)
-- **Retail 摩擦**：commission NT$12 / 期交稅 10 bps / slippage 15 bps + worst-side fill (非 mid)
-- **Pro 統計**：Bootstrap CI 95% / sign-flip permutation (Politis & Romano 2010) / Deflated Sharpe (López-de-Prado 2014) / Calmar
-- **跨平台 launch**：subprocess.run + sys.exit(returncode) + cp950 stderr clean (R12.0-R12.13 連續 audit fix)
-- **測試**：pytest 447 passed, 2 skipped (~3 min full)
-- **Audit 紀律**：19 條 self-audit pattern + audit_doc_drift.py automated gate + Codex external audit chain (R12.0-R12.13)
+- **Volatility Surface 波動率曲面 fit** — SVI 5 參數 + SABR 4 參數 + 多項式 fallback；Gatheral & Jacquier (2014) arb-free 與 Lee (2004) bound 檢查；5 年回測窗口 1227 shard 100% 日期覆蓋。用 model price fallback 解決 60% bid/ask 缺值問題，得到乾淨的 mark-to-market（每日定價）。
+
+- **Walk-forward 回測引擎** — 252 日 train（訓練）/ 63 日 disjoint quarterly OOS（不重疊季度樣本外）folds。6 scenario =（Iron Condor + Vertical）×（vanilla（純策略）+ IV percentile gate（IV 百分位 gate）+ HMM 2-state regime gate（2 狀態 HMM 機制 gate））。嚴格 daily loop（每日迴圈）+ point-in-time（PIT，當下時點）正確性 — strategy factory 只看到 train 期 returns。
+
+- **Pro 量化統計工具鏈** — Bootstrap percentile CI（百分位信賴區間）、sign-flip permutation test（符號翻轉排列檢定，Politis & Romano 2010）、Deflated Sharpe Ratio（去膨脹 Sharpe，López-de-Prado 2014）、Calmar ratio。Retail（散戶）成本模型（手續費 NT$12 + 期交稅 10 bps + 滑價 15 bps）+ worst-side fill（最差側成交，賣方 fill at bid、買方 fill at ask）。
 
 ## 快速開始
 
 ```bash
+git clone https://github.com/JerryHuang0829/Options_Trading.git
+cd Options_Trading
+
+# 建 conda 環境（Python 3.12, conda-forge channel）
 conda create -c conda-forge --override-channels -n options python=3.12 -y
 conda activate options
 pip install -r requirements.txt
-cp .env.example .env
 
-# 全綠 verification
-pytest tests/ -q                                          # 預期 447 passed, 2 skipped
-ruff check src tests config scripts                       # PASS
-ruff format --check src tests config scripts              # PASS
-mypy src tests config scripts                             # PASS
-python scripts/audit_doc_drift.py                         # PASS
+# 跑一次完整 regression 確認環境就緒
+pytest tests/ -q                    # 預期：465 passed, 2 skipped, 約 3 分鐘
 
-# Smoke pipeline (~3-4 min)
-python scripts/_validate_week6_5yr.py --smoke --skip-surface-coverage-gate
-
-# 5yr full backtest (~18-20 min)
-python scripts/_validate_week6_5yr.py                     # with retail cost
-python scripts/_validate_week6_5yr.py --no-cost-model     # cost-free baseline
+# （Optional）啟動 dashboard portfolio showcase
+streamlit run dashboard/專案背景.py  # → http://localhost:8502，4 個 page
 ```
 
-## 架構
+## 關鍵設計決策（Key Design Decisions）
+
+每個技術選擇背後都有可驗證的理由，不是預設。
+
+### 為何 BSM-Merton 不是純 BSM
+TAIEX 是 price index（不是 total return），成分股配息會在除權日造成 schedule drop。純 BSM（`q=0`）會系統性偏置 ATM delta 約 `q·T·S`，並破壞 Put-Call Parity。Merton form 加入連續股利率 `q` 後，PCP 殘差降到 < 1e-10。
+→ 見 [`src/options/pricing.py`](src/options/pricing.py) 的 module docstring。
+
+### 為何預設 `WorstSideFillModel` 不是 mid
+散戶實際下市價單時，賣方成交在 bid、買方成交在 ask；用 mid 系統性高估賣方收入約半個 spread × multiplier。對 short premium 策略尤其 critical — 整段 backtest 可能因此假性贏錢。`engine.run_backtest` 預設 `WorstSideFillModel()`，要其他模型必須顯式指定。
+→ 見 [`src/backtest/engine.py`](src/backtest/engine.py) line 251 + [`src/backtest/execution.py`](src/backtest/execution.py) docstring。
+
+### 為何 sign-flip permutation 不是 random shuffle
+Sharpe = mean / std × √N 在 random shuffle 下完全不變（mean 與 std 都是排列不變量），原始 shuffle 的 p-value 沒意義。Sign-flip permutation（Politis & Romano 2010）對每筆 PnL 獨立翻轉 ±1，在 H0「對稱零飄移」假設下保留邊際分布同時讓 mean / Sharpe 真正變動。
+→ 見 [`src/backtest/stats.py::permutation_test`](src/backtest/stats.py) docstring。
+
+### 為何 walk-forward `step_days >= test_window_days`
+若 step < test_window，相鄰 fold 的 OOS 窗會重疊，concat daily PnL 會在同一日重複計算，導致 aggregate Sharpe / max drawdown / Calmar 全部 inflate。`WalkForwardConfig.__post_init__` 強制 raise — 是 critical correctness gate。
+→ 見 [`src/backtest/walk_forward.py`](src/backtest/walk_forward.py) line 85。
+
+### 為何 max_drawdown 必須對 cumulative PnL 而非 daily PnL
+`metrics.max_drawdown` contract 明定輸入為 cumulative PnL；對 daily PnL 跑 `cummax` 沒有經濟意義（會把單日最大盈拿來當 peak），會系統性低估 max DD 數倍。本 repo 在 2026-05-05 抓到並修復 `walk_forward._aggregate_folds` 將 daily PnL 直接傳入的 silent bug，修正後加 2 條 regression test 防止再犯。
+→ 見 [`src/backtest/metrics.py::max_drawdown`](src/backtest/metrics.py) docstring + [`tests/backtest/test_walk_forward.py`](tests/backtest/test_walk_forward.py) `test_aggregate_max_drawdown_uses_cumulative`。
+
+## Repository Tour（5 分鐘 onboarding）
+
+如果你只有 5 分鐘讀懂本 repo，建議讀這 3 個檔：
+
+| 檔案 | 為何先讀 |
+|---|---|
+| [`src/options/pricing.py`](src/options/pricing.py) | 數學引擎入口 — 自寫 BSM-Merton + IV solver；docstring 闡述 Merton form 與 PCP；對 py_vollib 交叉驗證的 contract |
+| [`src/backtest/walk_forward.py`](src/backtest/walk_forward.py) | 回測 OOS 設計 — `WalkForwardConfig` 的 disjoint OOS 不變式（line 85）+ `_aggregate_folds` 的 PIT 正確性 + max_drawdown bug 修法位置（line 371）|
+| [`tests/options/test_pricing.py`](tests/options/test_pricing.py) | 驗證紀律入口 — `test_bsm_matches_py_vollib` 50 random sample cross-validation；展示「自寫核心 + 業界 reference 對齊」的標準做法 |
+
+如果還有 5 分鐘，加讀：
+- [`src/backtest/stats.py`](src/backtest/stats.py) — Bootstrap CI / sign-flip permutation / Deflated Sharpe / Calmar 的引文與實作
+- [`src/backtest/engine.py`](src/backtest/engine.py) — 主 daily loop 與 `cum_pnl = realised + unrealised` 不變式
+
+或者啟動 dashboard 直接看視覺化：
+
+```bash
+streamlit run dashboard/專案背景.py    # http://localhost:8502
+```
+
+4 個 page：
+- **專案背景** — Hero metric / 路線圖 / 5 個核心能力 expander
+- **Page 1 定價核心** — BSM-Merton 公式 / 50-sample py_vollib 交叉驗證 / Strategy payoff diagram / Greeks 互動 slider / SVI Vol Surface 3D（1227 個 fit date 可選）
+- **Page 2 Walk-forward 結果** — 6 scenario 摘要表 / cumulative PnL curves / Bootstrap CI / Permutation null distribution / Retail cost ablation / Walk-forward fold timeline
+- **Page 3 Audit 紀律與 Bug 修法** — 14+1 輪 external review chain timeline / 4 件 hard gate / `agg_max_drawdown` silent bug deep dive / Pro methodology 4 badges
+
+## 專案結構
 
 ```
 src/
-├── options/       # BSM / Greeks / chain / regime gate (IV percentile / HMM 2-state) / vol surface
-├── strategies/    # Iron Condor / Vertical (IV skew gated) / RegimeWrappedStrategy
-├── backtest/      # walk_forward / engine / portfolio / execution (RetailCostModel) / monitor / stats
-└── data/          # TAIFEX loader / synthetic / enrich / cache
-tests/             # 鏡像 src/ 結構, 447 tests
-config/            # 常數
-scripts/           # CLI 入口 (_validate_week6_5yr.py / _validate_surface_mark_5_4a.py / audit_doc_drift.py)
-docs/              # bsm_derivation.md / options_math_audit.md / phase1_conclusion.md / roadmap.md / taifex_data_source_spec.md
-.claude/skills/    # self-audit (19-pattern) + multi-perspective + forensic-sweep
-reports/           # week6_5yr_* (with-cost) + week6_5yr_no_cost/ (cost-free baseline)
-data/taifex_cache/ # 1963 raw shards + 1227 surface_fits (2021-2026 100% coverage)
+├── options/         # 定價核心 — BSM-Merton + Greeks + IV solver,
+│                    #   chain helper, SVI/SABR vol surface, regime gate
+├── strategies/      # 策略實作 — IC / Vertical / calendar hedge
+├── backtest/        # 回測引擎 — walk-forward / portfolio / MtM /
+│                    #   FillModel / metrics / Pro 統計工具
+├── risk/            # 風控 gate — 4 條 hard limit + stop-loss
+├── data/            # TAIFEX loader / schema 解析 / parquet cache / enrich
+└── common/          # 凍結 domain 型別（OptionQuote / Order 等）
+
+tests/               # 鏡像 src/ 結構，465 tests
+scripts/             # CLI 入口（驗證管線）
+dashboard/           # Streamlit + Plotly portfolio showcase（4 page）
+config/              # 常數
+notebooks/           # 探索性分析（gitignored）
+data/taifex_cache/   # 本機 parquet cache（gitignored — 用 loader 重建）
 ```
 
-## Phase 1 5yr 真實結果
+## 各模組重點
 
-| Scenario | With-cost Sharpe | No-cost Sharpe | Trades / 15 folds |
-|----------|------|------|---|
-| IC_vanilla | -2.7047 | -2.7055 | 5 |
-| IC_IV_percentile | -2.6803 | -2.6869 | 4 |
-| IC_HMM | 0.0000 | 0.0000 | 0 |
-| Vertical_vanilla | -2.1463 | -2.1303 | 12 |
-| Vertical_IV_percentile | -2.1249 | -2.1101 | 10 |
-| Vertical_HMM | -2.8599 | -2.8670 | 1 |
+**`src/options/`** — 定價核心：BSM-Merton 封閉解（`pricing.py`）、5 Greeks Merton form（`greeks.py`）、option chain 篩選 helper（`chain.py`）、SVI / SABR / 多項式 3-tier vol surface fit + arb-free 守衛（`vol_surface.py` + `surface_batch.py` + `surface_cache.py`）、IV percentile 與 2-state HMM regime gate（`regime_gate.py`）。
 
-**所有 |Δ Sharpe| ≤ 0.016** → retail 摩擦不是 root cause. **strategy 真的沒 alpha**.
+**`src/strategies/`** — 策略實作：4 腳 Iron Condor 含 3 平倉觸發 + single-roll 調整（`iron_condor.py`）、bull put / bear call vertical spread（`vertical.py`）、calendar spread overlay（`calendar_hedge.py`）、`RegimeWrappedStrategy` 將純策略與 regime gate 組合（`gate_wrap.py`）。
 
-詳 [docs/phase1_conclusion.md](docs/phase1_conclusion.md) + [reports/week6_5yr_summary.md](reports/week6_5yr_summary.md).
+**`src/backtest/`** — 引擎與驗證：daily loop + PIT 正確性（`engine.py`）、`mark_to_market(mark_policy=...)` 三模式（`portfolio.py`）、4 種 FillModel + RetailCostModel（`execution.py`）、disjoint quarterly OOS folds + strategy-factory 注入（`walk_forward.py`）、Pro 統計四件組（`stats.py`）、Sharpe + max drawdown（`metrics.py`）。
 
-## 相關專案
+**`src/data/`** — TAIFEX 資料管線：下載 + Big5 解碼 + 3 向 schema 偵測 + ZIP magic-bytes guard（`taifex_loader.py`）、標準化 schema 驗證（`schema.py`）、雙層 parquet cache（`cache.py`）、per-strike IV / delta 計算 + execution gate（`enrich.py`）。
 
-- `../Quantitative-Trading`：舊 long-only TW stock factor research 專案, 2026-04-23 pivot 後保留為學習檔案
+## 技術棧
 
-## Status & 文件導覽
+| 套件 | 版本 |
+|---|---|
+| Python | 3.12 |
+| numpy | 2.4 |
+| pandas | 3.0 |
+| scipy | 1.17 |
+| py_vollib（交叉驗證 reference）| 1.0.1 |
+| pytest | 9.0 |
+| ruff（linter + formatter）| 0.15.11 |
+| mypy + pandas-stubs（靜態型別）| 1.20 / 3.0 |
+| pyarrow（parquet I/O）| 24.0 |
+| holidays（台灣假日）| 0.50 |
 
-- [HANDOFF.md](HANDOFF.md) — 當前 session snapshot（每 session end 覆寫）
-- [docs/phase1_conclusion.md](docs/phase1_conclusion.md) — Phase 1 alpha 證偽 honest report
-- [docs/roadmap.md](docs/roadmap.md) — Phase 1 / Phase 2 路線圖
-- [Codex-Prompt.md](Codex-Prompt.md) — 當前外部 LLM audit 任務書
-- [.claude/skills/self-audit/SKILL.md](.claude/skills/self-audit/SKILL.md) — 19 條 self-audit pattern
-- [CLAUDE.md](CLAUDE.md) — Claude Code 守則 + SOP
+## 驗證與可重現性
+
+每個 commit 必須通過 4 件 hard gate：
+
+```bash
+ruff check src tests config scripts          # Lint — All checks passed
+ruff format --check src tests config scripts # Format — 97 files unchanged
+mypy src tests config scripts                # 型別檢查 — no issues, 98 source files
+pytest tests/ -q                             # 465 passed, 2 skipped, 約 190 秒
+```
+
+加上文件漂移審計（防止過時 baseline 數字 / 絕對宣稱誤導）：
+
+```bash
+python scripts/audit_doc_drift.py            # PASS, 0 drift
+```
+
+End-to-end smoke pipeline（端對端煙霧測試）：
+
+```bash
+python scripts/_dummy_backtest_pipeline_check.py
+```
+
+完整 5 年 walk-forward 回測（含 retail 成本，約 20 分鐘）：
+
+```bash
+python scripts/_validate_week6_5yr.py
+```
+
+## References
+
+本 repo 的數學與統計實作引用以下文獻；對應的引文錨定在各 module docstring：
+
+**Option pricing**
+- Merton, R. C. (1973). *Theory of Rational Option Pricing*. Bell Journal of Economics and Management Science 4(1).
+
+**Volatility surface**
+- Gatheral, J., & Jacquier, A. (2014). *Arbitrage-free SVI volatility surfaces*. Quantitative Finance 14(1).
+- Lee, R. W. (2004). *The moment formula for implied volatility at extreme strikes*. Mathematical Finance 14(3).
+- Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002). *Managing Smile Risk*. Wilmott Magazine.
+
+**Backtest statistics**
+- Sharpe, W. F. (1994). *The Sharpe Ratio*. Journal of Portfolio Management 21(1).
+- Lo, A. W. (2002). *The Statistics of Sharpe Ratios*. Financial Analysts Journal 58(4).
+- Mertens, E. (2002). *Variance of the IID Estimator in Lo (2002)*.
+- López de Prado, M. (2014). *The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality*. Journal of Portfolio Management 40(5).
+- Politis, D. N., & Romano, J. P. (2010). *K-sample subsampling in general spaces: The case of independent time series*. Journal of Multivariate Analysis 101(2).
+- Phipson, B., & Smyth, G. K. (2010). *Permutation P-values should never be zero: Calculating exact P-values when permutations are randomly drawn*. Statistical Applications in Genetics and Molecular Biology 9(1).
+
+## License
+
+[MIT License](LICENSE) — 自由 fork / 修改 / 商用，保留 copyright notice 即可。
+
+## 免責聲明
+
+本 repo 為研究框架。回測結果僅供研究與教育用途，過去績效不保證未來結果，不構成任何投資建議。

@@ -20,6 +20,10 @@ holidays>=0.50,<1.0  # TXO 月選結算 = 第3週三+順延，holidays.TW 提供
 matplotlib>=3.8
 ipykernel>=6.29   # VSCode native notebook 後端；不裝 `jupyter` meta-package（Windows MAX_PATH 問題 + 用不到瀏覽器 UI）
 
+# Dashboard (Streamlit + Plotly portfolio showcase, 本機跑於 port 8502)
+streamlit>=1.31
+plotly>=5.18
+
 # Dev tooling (code quality + interview signal)
 ruff>=0.6
 mypy>=1.11

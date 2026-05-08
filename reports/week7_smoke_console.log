@@ -1,0 +1,39 @@
+
+======================================================================
+Step 1: load chain + TAIEX spot 2024-04-01 → 2025-04-01
+======================================================================
+  chain: 201,552 rows / 242 dates / 2.8s
+  TAIEX spot (window): 242 days
+
+======================================================================
+Step 2: enrich_pipeline + add_model_price + surface gate
+======================================================================
+  enriched 201,552 rows / IV fill 85.6% / 202.3s
+
+======================================================================
+Scenario HedgedIC_vanilla  (HedgedIC × vanilla × calendar)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=-2.204 / 0.7s
+
+======================================================================
+Scenario HedgedIC_IV_percentile  (HedgedIC × IV_percentile × calendar)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=-2.204 / 0.8s
+
+======================================================================
+Scenario HedgedIC_HMM  (HedgedIC × HMM × calendar)
+======================================================================
+  done 8/8 folds OK / agg_sharpe=0.000 / 35.2s
+
+======================================================================
+Step 5: write reports/
+======================================================================
+  week7_smoke_folds.csv: 24 rows
+  week7_smoke_scenarios.csv: 3 rows
+  week7_smoke_daily_pnl.csv: 504 rows
+  week7_smoke_rejected_reasons.csv: 2 rows
+  week7_smoke_monitor_metrics.json
+  week7_smoke_run_meta.json
+  week7_smoke_summary.md
+
+  Total: 243.0s  /  HMM warnings: 45

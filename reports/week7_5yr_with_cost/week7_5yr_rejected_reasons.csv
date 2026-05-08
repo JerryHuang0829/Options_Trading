@@ -1,0 +1,9 @@
+scenario,strategy,regime_gate,hedge_mode,backtest_scope_yr,backtest_start,backtest_end,fold_index,date,path,reason,leg
+HedgedIC_vanilla,HedgedIC,vanilla,calendar,5yr,2021-04-01,2026-04-28,0,2022-05-09,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=16050.0 expiry=2022-06-15 not in chain (underlying=16049),
+HedgedIC_vanilla,HedgedIC,vanilla,calendar,5yr,2021-04-01,2026-04-28,1,2022-09-19,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=14450.0 expiry=2022-10-19 not in chain (underlying=14426),
+HedgedIC_vanilla,HedgedIC,vanilla,calendar,5yr,2021-04-01,2026-04-28,9,2024-09-10,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=21050.0 expiry=2024-10-16 not in chain (underlying=21064),
+HedgedIC_vanilla,HedgedIC,vanilla,calendar,5yr,2021-04-01,2026-04-28,11,2025-04-15,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=19850.0 expiry=2025-05-21 not in chain (underlying=19858),
+HedgedIC_IV_percentile,HedgedIC,IV_percentile,calendar,5yr,2021-04-01,2026-04-28,0,2022-05-09,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=16050.0 expiry=2022-06-15 not in chain (underlying=16049),
+HedgedIC_IV_percentile,HedgedIC,IV_percentile,calendar,5yr,2021-04-01,2026-04-28,1,2022-09-19,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=14450.0 expiry=2022-10-19 not in chain (underlying=14426),
+HedgedIC_IV_percentile,HedgedIC,IV_percentile,calendar,5yr,2021-04-01,2026-04-28,9,2024-09-10,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=21050.0 expiry=2024-10-16 not in chain (underlying=21064),
+HedgedIC_IV_percentile,HedgedIC,IV_percentile,calendar,5yr,2021-04-01,2026-04-28,11,2025-04-15,hedge_attach,hedge_build_fail: calendar hedge: front ATM call strike=19850.0 expiry=2025-05-21 not in chain (underlying=19858),

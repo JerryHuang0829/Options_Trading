@@ -4,40 +4,40 @@
   "start_date": "2021-04-01",
   "end_date": "2026-04-28",
   "initial_capital": 1000000.0,
-  "started_at_utc": "2026-05-01T16:37:04.826421+00:00",
+  "started_at_utc": "2026-05-05T14:11:11.588607+00:00",
   "phase_durations_sec": {
-    "step1_load": 9.89,
-    "step2_enrich": 919.41
+    "step1_load": 11.07,
+    "step2_enrich": 990.89
   },
   "scenarios_run": [
     {
       "scenario": "IC_vanilla",
-      "duration_sec": 3.89,
+      "duration_sec": 5.9,
       "n_folds": 15
     },
     {
       "scenario": "IC_IV_percentile",
-      "duration_sec": 3.57,
+      "duration_sec": 7.23,
       "n_folds": 15
     },
     {
       "scenario": "IC_HMM",
-      "duration_sec": 142.42,
+      "duration_sec": 141.31,
       "n_folds": 15
     },
     {
       "scenario": "Vertical_vanilla",
-      "duration_sec": 4.82,
+      "duration_sec": 4.86,
       "n_folds": 15
     },
     {
       "scenario": "Vertical_IV_percentile",
-      "duration_sec": 4.39,
+      "duration_sec": 4.73,
       "n_folds": 15
     },
     {
       "scenario": "Vertical_HMM",
-      "duration_sec": 8.26,
+      "duration_sec": 7.4,
       "n_folds": 15
     }
   ],
@@ -53,6 +53,6 @@
   "iv_fill_rate": 0.8667491631297957,
   "model_price_fill_rate": 0.9847418175743842,
   "cost_model_disabled": false,
-  "total_duration_sec": 1097.58,
+  "total_duration_sec": 1174.26,
   "hmm_convergence_warnings_count": 792
 }

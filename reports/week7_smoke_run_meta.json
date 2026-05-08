@@ -1,0 +1,35 @@
+{
+  "script": "_validate_week7_hedged_ic.py",
+  "scope": "smoke",
+  "start_date": "2024-04-01",
+  "end_date": "2025-04-01",
+  "initial_capital": 1000000.0,
+  "cost_model_disabled": false,
+  "started_at_utc": "2026-05-02T05:41:47.259203+00:00",
+  "phase_durations_sec": {
+    "step1_load": 2.83,
+    "step2_enrich": 202.28,
+    "total": 243.0
+  },
+  "scenarios_run": [
+    {
+      "scenario": "HedgedIC_vanilla",
+      "duration_sec": 0.72,
+      "n_folds": 8
+    },
+    {
+      "scenario": "HedgedIC_IV_percentile",
+      "duration_sec": 0.8,
+      "n_folds": 8
+    },
+    {
+      "scenario": "HedgedIC_HMM",
+      "duration_sec": 35.19,
+      "n_folds": 8
+    }
+  ],
+  "phase1_week7_quick_a": true,
+  "feasibility_audit_ref": "reports/week7_feasibility.md (Day 7.0)",
+  "hedge_mode": "calendar",
+  "hmm_warning_count": 45
+}

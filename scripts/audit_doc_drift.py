@@ -63,7 +63,7 @@ _EXCLUDE_FILES = {"audit_doc_drift.py"}  # self-exclude: script 含 keyword 字�
 _INCLUDE_EXTS = {".py", ".md", ".json", ".yaml", ".yml", ".toml"}
 
 # Latest known audit round — update when bumping audit (R11.X → R11.X+1)
-LATEST_AUDIT_ROUND = "R11.21"  # current pending audit; older = stale
+LATEST_AUDIT_ROUND = "R12.13"  # Phase 1 R12 chain closed at R12.13; Week 7 Quick A post-R12.13
 
 
 @dataclass

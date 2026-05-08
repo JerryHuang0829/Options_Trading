@@ -1,0 +1,42 @@
+
+======================================================================
+Step 1: load chain + TAIEX spot 2021-04-01 → 2026-04-28
+======================================================================
+  filtered 5,334 post-expiry rows
+  chain: 909,938 rows / 1227 dates / 10.9s
+  TAIEX spot (window): 1231 days
+
+======================================================================
+Step 2: enrich_pipeline + add_model_price + surface gate
+======================================================================
+  enriched 909,938 rows / IV fill 86.7% / 921.8s
+  surface coverage: 100.0% (1227/1227 dates)
+  danger_rows: 8,073 / truly_unmarkable: 0
+
+======================================================================
+Scenario HedgedIC_vanilla  (HedgedIC × vanilla × calendar)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.482 / 4.5s
+
+======================================================================
+Scenario HedgedIC_IV_percentile  (HedgedIC × IV_percentile × calendar)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=-2.411 / 5.0s
+
+======================================================================
+Scenario HedgedIC_HMM  (HedgedIC × HMM × calendar)
+======================================================================
+  done 15/15 folds OK / agg_sharpe=0.000 / 129.0s
+
+======================================================================
+Step 5: write reports/
+======================================================================
+  week7_5yr_folds.csv: 45 rows
+  week7_5yr_scenarios.csv: 3 rows
+  week7_5yr_daily_pnl.csv: 2835 rows
+  week7_5yr_rejected_reasons.csv: 8 rows
+  week7_5yr_monitor_metrics.json
+  week7_5yr_run_meta.json
+  week7_5yr_summary.md
+
+  Total: 1071.5s  /  HMM warnings: 770

@@ -17,6 +17,7 @@ import pandas as pd
 import pytest
 
 from src.backtest.walk_forward import (
+    FoldResult,
     WalkForwardConfig,
     _generate_fold_windows,
     walk_forward_backtest,
@@ -293,3 +294,85 @@ def test_extract_rejected_reasons_cycle_safe_r12_4() -> None:
     result = _extract_rejected_reasons(CycleWrapper())
     assert result.empty
     assert list(result.columns) == ["date", "path", "reason", "leg"]
+
+
+# ---------------------------------------------------------------------------
+# Aggregate max_drawdown口徑 (Codex audit 2026-05-05): _aggregate_folds 必須
+# 對 daily PnL 先 cumsum 再 call max_drawdown (metrics.py docstring contract).
+# 原 bug: agg_metrics["max_drawdown"] = max_drawdown(agg_pnl, ...)，agg_pnl
+# 是 concat 後 daily PnL，不是 cumulative — 報表 maxDD 全被 1.3-4.2 倍低估.
+# ---------------------------------------------------------------------------
+
+
+def _make_fold(
+    fold_index: int,
+    test_start: pd.Timestamp,
+    test_end: pd.Timestamp,
+    daily_pnl: pd.Series,
+) -> FoldResult:
+    """Lightweight FoldResult for direct _aggregate_folds testing."""
+    return FoldResult(
+        fold_index=fold_index,
+        train_start=test_start - pd.Timedelta(days=1),
+        train_end=test_start - pd.Timedelta(days=1),
+        test_start=test_start,
+        test_end=test_end,
+        daily_pnl=daily_pnl,
+        trades=pd.DataFrame(),
+        mark_audit=pd.DataFrame(),
+        metrics={},
+        final_cash=1_000_000.0,
+        final_unrealised=0.0,
+        error=None,
+    )
+
+
+def test_aggregate_max_drawdown_uses_cumulative() -> None:
+    """Direct: known daily PnL → cumulative trough → expected maxDD.
+
+    daily PnL: [+100, -300, +50, -200] over 4 days
+    cumulative: [+100, -200, -150, -350]
+    running peak (incl. 0 baseline): [+100, +100, +100, +100]
+    drawdown: [0, -300, -250, -450] → min = -450
+    maxDD as fraction of $1M cap = -0.00045
+    """
+    from src.backtest.walk_forward import _aggregate_folds
+
+    initial_capital = 1_000_000.0
+    dates = pd.date_range("2026-01-05", periods=4, freq="D")
+    daily_pnl = pd.Series([100.0, -300.0, 50.0, -200.0], index=dates)
+    fold = _make_fold(0, dates[0], dates[-1], daily_pnl)
+
+    result = _aggregate_folds([fold], initial_capital=initial_capital)
+
+    expected_max_dd = -450.0 / initial_capital  # = -0.00045
+    assert result.metrics["max_drawdown"] == pytest.approx(expected_max_dd, abs=1e-12), (
+        f"agg max_drawdown should reflect cumulative trough -450/-{initial_capital:.0f} "
+        f"= {expected_max_dd:.6f}; got {result.metrics['max_drawdown']:.6f}. "
+        f"If close to -0.0003 (=-300/1e6), bug regressed: daily PnL is being passed "
+        f"to max_drawdown instead of cumsum (metrics.max_drawdown contract requires "
+        f"cumulative; see engine.py:358 for correct caller)."
+    )
+
+
+def test_aggregate_max_drawdown_consistent_with_engine_path() -> None:
+    """Cross-consistency: feed concat'd daily PnL through both
+    (a) _aggregate_folds (walk_forward path) and (b) engine.metrics path
+    (cumsum then max_drawdown). Both must agree to ~float precision.
+    """
+    from src.backtest.metrics import max_drawdown
+    from src.backtest.walk_forward import _aggregate_folds
+
+    initial_capital = 1_000_000.0
+    rng = np.random.default_rng(seed=42)
+    daily_pnl_values = rng.normal(loc=-50.0, scale=500.0, size=120)
+    dates = pd.date_range("2026-01-02", periods=120, freq="B")
+    daily_pnl = pd.Series(daily_pnl_values, index=dates)
+    # Split into 2 disjoint folds (60 days each)
+    fold0 = _make_fold(0, dates[0], dates[59], daily_pnl.iloc[:60])
+    fold1 = _make_fold(1, dates[60], dates[-1], daily_pnl.iloc[60:])
+
+    agg = _aggregate_folds([fold0, fold1], initial_capital=initial_capital)
+
+    expected = max_drawdown(daily_pnl.cumsum(), initial_capital=initial_capital)
+    assert agg.metrics["max_drawdown"] == pytest.approx(expected, abs=1e-12)

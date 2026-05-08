@@ -1,0 +1,45 @@
+{
+  "HedgedIC_vanilla": {
+    "n_days_observed": 168.0,
+    "n_legs_marked_total": 12.0,
+    "n_fallback_settle_total": 0.0,
+    "n_fallback_surface_total": 0.0,
+    "n_fallback_settle_3rd_total": 0.0,
+    "fallback_days_count": 0.0,
+    "fallback_legs_ratio": 0.0,
+    "settle_3rd_fallback_ratio": 0.0,
+    "avg_fallback_rate": 0.0,
+    "hedge_attach_fail_count": 1,
+    "hedge_attach_fail_reasons_sample": [
+      "hedge_build_fail: calendar hedge: front ATM call strike=21050.0 expiry=2024-10-16 not in chain (underlying=21064)"
+    ]
+  },
+  "HedgedIC_IV_percentile": {
+    "n_days_observed": 168.0,
+    "n_legs_marked_total": 12.0,
+    "n_fallback_settle_total": 0.0,
+    "n_fallback_surface_total": 0.0,
+    "n_fallback_settle_3rd_total": 0.0,
+    "fallback_days_count": 0.0,
+    "fallback_legs_ratio": 0.0,
+    "settle_3rd_fallback_ratio": 0.0,
+    "avg_fallback_rate": 0.0,
+    "hedge_attach_fail_count": 1,
+    "hedge_attach_fail_reasons_sample": [
+      "hedge_build_fail: calendar hedge: front ATM call strike=21050.0 expiry=2024-10-16 not in chain (underlying=21064)"
+    ]
+  },
+  "HedgedIC_HMM": {
+    "n_days_observed": 168.0,
+    "n_legs_marked_total": 0.0,
+    "n_fallback_settle_total": 0.0,
+    "n_fallback_surface_total": 0.0,
+    "n_fallback_settle_3rd_total": 0.0,
+    "fallback_days_count": 0.0,
+    "fallback_legs_ratio": NaN,
+    "settle_3rd_fallback_ratio": NaN,
+    "avg_fallback_rate": 0.0,
+    "hedge_attach_fail_count": 0,
+    "hedge_attach_fail_reasons_sample": []
+  }
+}
