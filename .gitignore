@@ -50,18 +50,15 @@ pytest-cache-files-*/
 data/taifex_cache/raw_zip/
 data/taifex_cache/raw_unzipped/
 
-# Large derived caches (~200 MB total) — rebuild via taifex_loader /
-# surface fit pipeline (scripts/_validate_surface_mark_5_4a.py)
+# Large raw caches (~190 MB) — rebuild via taifex_loader.backfill_range
 data/taifex_cache/raw/
 data/taifex_cache/strategy_view/
-data/taifex_cache/surface_fits/
 data/taifex_cache/_extract_tmp/
 data/taifex_cache/_backfill_manifest.csv
+# NOTE: surface_fits/ (15 MB, 1227 parquet) committed — dashboard SVI 3D 需要
 
-# 5yr backtest large reports (rebuild via scripts/_validate_week6_5yr.py)
-# Keep scenarios.csv / summary.md / monitor_metrics.json for reference;
-# ignore daily_pnl.csv (5670 rows, 432K) + day_5_4* (Day 5.4 historical)
-reports/week6_5yr_daily_pnl.csv
+# Historical Day 5.4 reports (superseded by week6_5yr_*)
+# NOTE: week6_5yr_daily_pnl.csv (436 KB) committed — dashboard cum PnL / permutation 需要
 reports/week6_5yr_no_cost/daily_pnl.csv
 reports/day_5_4*
 
