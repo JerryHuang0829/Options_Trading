@@ -9,14 +9,14 @@
 ![Lint](https://img.shields.io/badge/ruff-passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-## TL;DR（30 秒版）
+## 一分鐘看懂（先讀這段）
 
 - **這是什麼**：一個個人量化研究專案 —— 用機構等級的方法論，嚴格檢驗「在台灣指數選擇權（TXO）、零售 NT$ 100 萬規模下，賣方溢價策略（Iron Condor / Vertical Spread）能不能在 5 年真實樣本外穩定賺錢？」
 - **怎麼做**：自寫 BSM-Merton 定價核心（對 `py_vollib` 對齊到 1e-8）→ 8 年 TAIFEX 真期權鏈資料管線 → SVI/SABR vol surface 補乾淨 mark-to-market → 6 scenario × 15 個不重疊季度 OOS 的 walk-forward 回測 → Pro 統計判定（Bootstrap CI / sign-flip permutation / Deflated Sharpe）。每個結論都經 external review chain 反覆攻擊。
 - **結論**：6 scenario 在 5 年 OOS 上 **Sharpe 全 < 0**；把零售成本整個關掉重跑，Sharpe `|Δ| ≤ 0.016` —— 不是手續費壓死的，是策略本身在這段 regime 沒有 edge。誠實記 **NO-GO**，不降標、不反向湊參數。同一套工程基礎設施延續到 Phase 2（換策略類別、重跑 fresh OOS，仍朝小額 paper → live）。
 - **為什麼值得看**：嚴謹驗證下的負面結果 + 「敢殺自己假設」的研究紀律，比鬆散方法論下的漂亮 PASS 更有科學價值。**想看互動版** → `streamlit run dashboard/專案背景.py`（4 頁圖表：定價核心 / Walk-forward 結果 / Audit 紀律）。
 
-> **只有 5 分鐘？** 讀這段 TL;DR → 跑 `streamlit run dashboard/專案背景.py` 看主頁與 Page 1 的 py_vollib 交叉驗證 → 翻 [`src/options/pricing.py`](src/options/pricing.py)（數學引擎）與 [`src/backtest/walk_forward.py`](src/backtest/walk_forward.py)（OOS 設計）。下方「結果與結論」是完整數字，「Key Design Decisions」是每個技術選擇的理由。
+> **只有 5 分鐘？** 讀完上面這段 → 跑 `streamlit run dashboard/專案背景.py` 看主頁與 Page 1 的 py_vollib 交叉驗證 → 翻 [`src/options/pricing.py`](src/options/pricing.py)（數學引擎）與 [`src/backtest/walk_forward.py`](src/backtest/walk_forward.py)（OOS 設計）。下方「結果與結論」是完整數字，「Key Design Decisions」是每個技術選擇的理由。
 
 ## 核心能力
 
