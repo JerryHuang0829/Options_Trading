@@ -6,6 +6,11 @@ scipy>=1.11
 # Options pricing
 py_vollib>=1.0.1
 
+# Regime detection — src/options/regime_gate.py HMMRegimeGate (Hamilton 1989
+# 2-state Markov-switching via GaussianHMM). Required by tests/options/test_regime_gate.py
+# + scripts/_validate_week6_5yr.py (HMM ablation arm).
+hmmlearn>=0.3,<1.0
+
 # Testing
 pytest>=8.0
 pytest-cov>=5.0
@@ -26,7 +31,7 @@ plotly>=5.18
 
 # Dev tooling (code quality + interview signal)
 ruff>=0.6
-mypy>=1.11
+mypy>=1.11,<2.0  # pin <2.0: mypy 2.0 + 新版 requests/holidays stubs 會把仍需要的 type:ignore 標成 unused-ignore（pyproject warn_unused_ignores=true → fail）。開發/驗證皆在 mypy 1.x。
 pandas-stubs>=2.2  # 讓 mypy 對 pandas 可辨識
 
 # Phase 2 (uncomment when integrating live trading)

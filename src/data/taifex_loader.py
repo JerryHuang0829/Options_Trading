@@ -60,7 +60,8 @@ from src.data.schema import (
 # Range = 2018-2028 covers 7yr pivot (2026-04-28 user §0a) backfill
 # (2018-01 → 2025-12 main + 2026 forward expiries) + 2027-2028 buffer.
 # Widen via holidays.TW(years=range(...)) if extending range.
-_TW_HOLIDAYS = holidays.TW(years=range(2018, 2029))  # type: ignore[attr-defined]
+# (holidays>=0.50 ships py.typed; `TW` is recognised — no `type: ignore` needed.)
+_TW_HOLIDAYS = holidays.TW(years=range(2018, 2029))
 
 
 def _txo_monthly_settlement_date(year: int, month: int) -> pd.Timestamp:

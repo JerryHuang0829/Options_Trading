@@ -43,7 +43,9 @@
 | Vertical (IV percentile gate) | −2.12 | −5.4% | 10 / 15 |
 | Vertical (HMM 2-state regime gate) | −2.86 | −1.0% | 1 / 15 |
 
-**Phase 1 出口條件「OOS Sharpe > 1」FAIL** → Iron Condor / Vertical short-premium 假設在 5 年 OOS 上證偽，不啟動 paper trading。
+**Phase 1 出口條件「OOS Sharpe > 1」FAIL** → Iron Condor / Vertical short-premium 假設在 5 年 OOS 上**未通過驗證（NO-GO）**，不啟動 paper trading。
+
+> 用詞精準：Vertical 兩個 scenario（n=10~12）弱顯著為負；IC 兩個 vanilla/IV-gate scenario 5 年僅成交 4~5 筆、HMM gate 0 筆 → 樣本不足，嚴格說屬「無法判定（inconclusive）」而非完整 falsification。binding constraint = TXO 每日 cohort 稀疏（平均 1.44 個到期、p10=1.0），45-DTE±7 band + 嚴格 delta 容差下很難每日湊齊 4 條合格腿。完整出口條件、6 scenario 詳細統計（CI / permutation p / DSR）、permutation H0 caveat 與 Phase 2 候選方向見 [`docs/phase1_conclusion.md`](docs/phase1_conclusion.md)。
 
 兩個刻意做的紀律約束，避免把「失敗」洗成「成功」：
 

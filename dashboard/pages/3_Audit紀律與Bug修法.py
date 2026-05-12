@@ -102,7 +102,7 @@ st.header("3.2 4 件 Hard Gate Latest Run")
 
 st.markdown(
     """
-    每個 commit 必通過 4 件 hard gate（per CLAUDE.md §2 紀律）：
+    每個 commit 必通過 4 件 hard gate（本 repo 開發紀律）：
 
     | 項目 | 檢查內容 |
     |---|---|
@@ -136,7 +136,7 @@ gate_results = [
     {
         "Gate": "python scripts/audit_doc_drift.py",
         "Status": "✅ PASS",
-        "Detail": "0 drift, 2 pre-existing absolute_claim warnings",
+        "Detail": "0 drift, 1 pre-existing absolute_claim warning",
     },
     {
         "Gate": "python scripts/_dummy_backtest_pipeline_check.py",

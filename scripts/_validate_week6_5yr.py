@@ -1217,15 +1217,31 @@ def _build_summary_md(
         "period 偶發 'Model is not converging'; high count signals regime-detection "
         "unreliability.\n"
     )
-    # R12.12 strategy NO-GO note (Codex R12.10/R12.11 5yr 真跑 verdict)
+    # Phase 1 strategy verdict — honest wording: 'falsified' is too strong because
+    # IC scenarios traded only 0-5 times over 5yr (Bootstrap CI crosses 0, p > 0.1)
+    # → strictly inconclusive/under-powered, not a clean falsification. Aligned with
+    # reports/week6_5yr_ablation_matrix.csv gate_alpha_evidence='inconclusive'.
     if run_meta.get("scope") == "5yr":
-        lines.append("\n## Phase 1 Strategy Verdict (R12.12 honest report)\n")
+        lines.append("\n## Phase 1 Strategy Verdict (honest report)\n")
         lines.append(
-            "- 5yr OOS Sharpe (all scenarios): negative; HMM gate 0-1 trades / "
-            "15 folds → **strategy NO-GO for paper trading**. Phase 1 alpha "
-            "hypothesis (IC + Vertical with regime gate on 5yr TXO) **falsified**. "
-            "Pro 紀律: 不反向改 strategy chasing positive Sharpe (= data snooping); "
-            "honest 接受結論. 詳 [docs/phase1_conclusion.md](../docs/phase1_conclusion.md).\n"
+            "- 5yr OOS Sharpe (all 6 scenarios): negative; no scenario passes the "
+            "pre-registered Pro exit criteria (Bootstrap CI excludes 0 on positive "
+            "side / DSR > 0.95 / Calmar > 0.5) → **Phase 1 verdict: NO-GO** (not "
+            "tradeable as-is).\n"
+        )
+        lines.append(
+            "- Strength of evidence: Vertical scenarios are weakly significant-"
+            "negative (CI excludes 0, permutation p < 0.05, n=10-12 trades); IC "
+            "scenarios traded only 0-5 times over 5yr (Bootstrap CI crosses 0, p > "
+            "0.1) → strictly **inconclusive / under-powered**, not a clean "
+            "falsification. Binding constraint per Week 7 feasibility: TXO daily "
+            "cohort sparsity (mean 1.44 expiries/day, p10=1.0) + 45-DTE±7 band + "
+            "tight delta tolerance → rarely finds 4 valid legs.\n"
+        )
+        lines.append(
+            "- Pro 紀律: 不在事後反向改 strategy chasing positive Sharpe (= data "
+            "snooping); 對「未通過出口條件」與「假設被證偽」誠實區分. 詳 "
+            "[docs/phase1_conclusion.md](../docs/phase1_conclusion.md).\n"
         )
     if run_meta.get("cost_model_disabled"):
         lines.append(

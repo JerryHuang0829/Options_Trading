@@ -39,10 +39,11 @@ tmp[0-9a-z]*
 .claude/
 *.md
 !README.md
-# Published technical docs (math derivation / audit reference / TAIFEX data spec)
+# Published technical docs (math derivation / audit reference / TAIFEX data spec / Phase 1 結論)
 !docs/bsm_derivation.md
 !docs/options_math_audit.md
 !docs/taifex_data_source_spec.md
+!docs/phase1_conclusion.md
 
 # OS
 .DS_Store

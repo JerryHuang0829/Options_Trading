@@ -85,9 +85,13 @@ st.markdown(
     > 本 repo 是 systematic options strategy 研究框架：自寫 BSM-Merton 對 50 random sample 對齊 `py_vollib` reference 至 1e-8 精度；
     > 用 8 年 TAIFEX 真資料跑 6 scenario walk-forward；經 14 輪 external review chain + 1 輪內部驗證抓 silent bug 修法；
     > 以 Pro 統計方法（PIT / Bootstrap CI / sign-flip permutation / Deflated Sharpe）嚴謹判定
-    > **Phase 1 IC/Vertical short premium 假設於 5yr OOS 證偽**。
+    > **Phase 1 IC/Vertical short premium 於 5yr OOS 為 NO-GO**（6 scenario 全 negative Sharpe、無一通過預設出口條件）。
     >
-    > 下方 dashboard 展示支撐結論的證據鏈與方法學。
+    > 用詞精準：IC scenario 5 年僅成交 0~5 筆（全期共 32 筆）→ Bootstrap CI 跨零、permutation p > 0.1 →
+    > 嚴格說屬「樣本不足、無法判定（inconclusive）」而非完整「證偽」；binding constraint = TXO 每日 cohort 稀疏（平均 1.44 個到期）。
+    > 詳見 Page 2 與 [`docs/phase1_conclusion.md`](https://github.com/JerryHuang0829/Options_Trading/blob/main/docs/phase1_conclusion.md)。
+    >
+    > 下方 dashboard 展示支撐此判定的證據鏈與方法學。
     """
 )
 

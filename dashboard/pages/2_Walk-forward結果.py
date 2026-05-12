@@ -49,10 +49,31 @@ st.markdown(
     5. **Retail cost ablation**：with-cost vs no-cost Sharpe 對比，判斷 retail 摩擦是否為 root cause
     6. **Walk-forward 設計**：disjoint quarterly OOS 視覺化，解釋 step ≥ test_window 的 critical correctness gate
 
-    結果：5 年 OOS 6 scenario 全 negative Sharpe；retail cost ablation 證明摩擦不是 root cause；
-    **strategy alpha 證偽**（不為產品結論，為 framework 嚴謹度的 demonstration — 對 quant interview portfolio
-    而言，「能嚴謹證偽自己的 hypothesis」比「假裝賺錢」更有信號）。
+    結果：5 年 OOS 6 scenario 全 negative Sharpe，無一通過預設 Pro 出口條件 → **Phase 1 verdict NO-GO**。
+    retail cost ablation 顯示摩擦不是主因（但見 §2.5：交易筆數太少 n=0~12，ablation 本身 underpowered，不能單獨當「沒 edge」的證明）。
+
+    用詞精準（與 `reports/week6_5yr_ablation_matrix.csv` 的 `gate_alpha_evidence='inconclusive'` 一致）：
+    Vertical scenario 弱顯著為負（CI 不跨零、permutation p < 0.05，但 n=10~12）；IC scenario 因 5 年僅成交 0~5 筆，
+    Bootstrap CI 跨零（IC_vanilla `[-1.46, +0.15]`）、p > 0.1 → 屬「**樣本不足無法判定 (inconclusive)**」而非完整 falsification。
+    binding constraint = **TXO 每日 cohort 稀疏（平均 1.44 個到期、p10=1.0）** + 45-DTE±7 band + 嚴格 delta 容差 → 很難每日湊齊 4 條合格腿。
+    對 quant interview portfolio 而言，「能區分『未通過出口條件』與『假設被證偽』、並把 binding constraint 量化」比「假裝賺錢」更有訊號。
     """
+)
+
+# 把「全期僅 32 筆交易」放到一眼可見 — 這是結論為 NO-GO 但屬 inconclusive 的根本原因。
+_scn = load_5yr_scenarios()
+_total_trades = int(_scn["total_trades"].sum())
+_per_scn = " / ".join(
+    f"{SCENARIO_DISPLAY_NAMES.get(r['scenario'], r['scenario'])}: {int(r['total_trades'])}"
+    for _, r in _scn.iterrows()
+)
+st.warning(
+    f"⚠️ **全期僅 {_total_trades} 筆交易**（5 年 × 6 scenario；每 scenario：{_per_scn}）。"
+    f"IC 路徑每個 scenario 只成交 0~5 筆 → Bootstrap CI 跨零、permutation p > 0.1 → "
+    f"**這就是結論為「NO-GO 但屬 inconclusive（樣本不足、無法判定）」而非「short premium 假設被完整 falsify」的原因** —— "
+    f"策略在 Phase 1 這組參數化（45-DTE±7 band + 嚴格 delta 容差）下，在 TXO 每日平均只有 1.44 個到期 cohort 的微結構裡，"
+    f"絕大多數日子湊不齊 4 條合格腿就不開倉。Vertical 路徑 10~12 筆雖弱顯著為負，但樣本也偏小。",
+    icon="⚠️",
 )
 
 st.divider()
@@ -275,6 +296,10 @@ st.markdown(
     **Sign-flip permutation test**（Politis & Romano 2010）：對每筆 PnL 獨立翻轉 ±1（共 1000 次），
     計算 null 分布下 |Sharpe|，p-value = `(n_extreme + 1) / (n_iter + 1)`（Phipson & Smyth 2010 unbiased）。
     為何不用 random shuffle：Sharpe 對 shuffle 完全不變（mean 與 std 都是排列不變量），原始 shuffle 的 p-value 沒意義。
+
+    ⚠️ **caveat**：sign-flip 的 H0 是「PnL 對稱、零飄移」；short-premium 策略 PnL 嚴重左偏（小賺多、偶爾大賠），
+    H0 不嚴格成立，故 permutation p-value **只能輔助**，不能當唯一 alpha 顯著性結論 —— **Bootstrap 95% CI 正側不跨零仍是 Phase 1 出口主硬條件**
+    （更嚴格可用 block / stationary bootstrap 處理左偏與序列相關）。
 
     code 路徑：[`src/backtest/stats.py`](https://github.com/JerryHuang0829/Options_Trading/blob/main/src/backtest/stats.py)
     """

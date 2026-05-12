@@ -14,7 +14,7 @@ Return conventions::
     rho:    per 1.0 rate move          (call > 0; put < 0)
 
 Greek identifiers use English in code (``delta``); narrative text uses Greek
-letters (Δ, Γ, Θ, ν, ρ) per CLAUDE.md §1.
+letters (Δ, Γ, Θ, ν, ρ).
 
 py_vollib unit conversion (cross-check):
   - delta / gamma:  ``my == pv`` (no conversion)

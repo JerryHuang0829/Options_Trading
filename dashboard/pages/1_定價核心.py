@@ -405,7 +405,7 @@ st.markdown(
     | `Dividend yield q %` | 連續股利率 | TAIEX 歷史 ≈ 3.5%；q 越大 call delta 越小（dividend drag） |
     | `Option type` | call / put | Δ 與 ρ 符號相反；Γ / ν 在 call / put 相同 |
 
-    **單位慣例**（per CLAUDE.md §1，與 `py_vollib` 交叉對照）：
+    **單位慣例**（與 `py_vollib` reference 交叉對照）：
     - Δ Γ：per 1.0 spot move（無單位差）
     - ν：per 1.0 sigma move（py_vollib 對照需 ×0.01 換算 per 1%）
     - Θ：per-year calendar（÷365 才是 per-day decay）
