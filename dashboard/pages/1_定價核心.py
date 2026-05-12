@@ -175,7 +175,7 @@ with left:
         height=400,
         margin={"l": 60, "r": 20, "t": 20, "b": 60},
     )
-    st.plotly_chart(fig_scatter, use_container_width=True)
+    st.plotly_chart(fig_scatter, width="stretch")
 
 with right:
     st.subheader("Diff distribution (my - pv)")
@@ -194,7 +194,7 @@ with right:
         height=400,
         margin={"l": 60, "r": 20, "t": 20, "b": 60},
     )
-    st.plotly_chart(fig_hist, use_container_width=True)
+    st.plotly_chart(fig_hist, width="stretch")
 
 with st.expander("📋 50-sample 原始資料"):
     st.dataframe(
@@ -324,7 +324,7 @@ with tab_ic:
             f"Iron Condor: long {ic_strikes[0]} put / short {ic_strikes[1]} put / "
             f"short {ic_strikes[2]} call / long {ic_strikes[3]} call (credit {ic_credit})",
         ),
-        use_container_width=True,
+        width="stretch",
     )
     cols = st.columns(4)
     cols[0].metric("Max Profit", f"+{ic_credit}", help="收 net credit；spot 落在 short K 中間時")
@@ -346,7 +346,7 @@ with tab_bull:
             f"Bull Put Spread: long {bull_strikes[0]} put / short {bull_strikes[1]} put "
             f"(credit {bull_credit})",
         ),
-        use_container_width=True,
+        width="stretch",
     )
     cols = st.columns(3)
     cols[0].metric("Max Profit", f"+{bull_credit}", help="spot 留在短 put 之上")
@@ -367,7 +367,7 @@ with tab_bear:
             f"Bear Call Spread: short {bear_strikes[0]} call / long {bear_strikes[1]} call "
             f"(credit {bear_credit})",
         ),
-        use_container_width=True,
+        width="stretch",
     )
     cols = st.columns(3)
     cols[0].metric("Max Profit", f"+{bear_credit}", help="spot 留在短 call 之下")
@@ -545,7 +545,7 @@ fig_greeks.update_layout(
     title_text=f"K={g_K} / T={g_T_days}d / σ={g_sigma_pct}% / r={g_r_pct}% / q={g_q_pct}% / {g_opt_type}",
 )
 
-st.plotly_chart(fig_greeks, use_container_width=True)
+st.plotly_chart(fig_greeks, width="stretch")
 
 # 顯示 ATM 數值（S=K）
 atm_delta = delta(g_K, g_K, g_T, g_r, g_q, g_sigma, option_type=g_opt_type)
@@ -686,7 +686,7 @@ else:
                     height=500,
                     margin={"l": 0, "r": 0, "t": 30, "b": 0},
                 )
-                st.plotly_chart(fig_3d, use_container_width=True)
+                st.plotly_chart(fig_3d, width="stretch")
 
             with right:
                 st.subheader("IV Smile 截面")
@@ -718,7 +718,7 @@ else:
                     height=400,
                     margin={"l": 60, "r": 20, "t": 50, "b": 60},
                 )
-                st.plotly_chart(fig_smile, use_container_width=True)
+                st.plotly_chart(fig_smile, width="stretch")
 
             # SVI 參數表
             st.subheader("SVI 5 參數（per expiry）")

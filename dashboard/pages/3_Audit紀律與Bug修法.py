@@ -83,7 +83,7 @@ with col2:
 
 st.dataframe(
     audit_df,
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
 )
 
@@ -156,7 +156,7 @@ def _color_status(val: str) -> str:
 
 styled_gate = gate_df.style.map(_color_status, subset=["Status"])
 
-st.dataframe(styled_gate, use_container_width=True, hide_index=True)
+st.dataframe(styled_gate, width="stretch", hide_index=True)
 
 cols = st.columns(4)
 with cols[0]:
@@ -306,7 +306,7 @@ st.dataframe(
         {"Published (BUG)": "{:.4%}", "Correct (cumsum)": "{:.4%}", "倍數低估": "{:.2f}x"},
         na_rep="—",
     ),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
 )
 
@@ -339,7 +339,7 @@ fig_ratio.update_layout(
     xaxis_tickangle=-15,
     showlegend=False,
 )
-st.plotly_chart(fig_ratio, use_container_width=True)
+st.plotly_chart(fig_ratio, width="stretch")
 
 st.warning(
     "**Vertical_vanilla 報表 maxDD -1.66% 真值 -6.94%（4.2x 低估）**；若 Phase 1 出口條件含 Max DD < 5% gate，"

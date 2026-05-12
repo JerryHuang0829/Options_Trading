@@ -131,7 +131,7 @@ styled = (
     .map(_highlight_zero, subset=["Deflated Sharpe"])
 )
 
-st.dataframe(styled, use_container_width=True, hide_index=True)
+st.dataframe(styled, width="stretch", hide_index=True)
 
 # 下方 4 個 takeaways（觀察、紀律陳述）
 col1, col2, col3, col4 = st.columns(4)
@@ -224,7 +224,7 @@ fig_cum.update_layout(
     hovermode="x unified",
 )
 
-st.plotly_chart(fig_cum, use_container_width=True)
+st.plotly_chart(fig_cum, width="stretch")
 
 # 4 個 takeaway 數字
 col1, col2, col3, col4 = st.columns(4)
@@ -323,7 +323,7 @@ with left:
         height=400,
         margin={"l": 200, "r": 20, "t": 20, "b": 50},
     )
-    st.plotly_chart(fig_ci, use_container_width=True)
+    st.plotly_chart(fig_ci, width="stretch")
     st.caption(
         "黑色菱形 = observed Sharpe；橫條 = 95% CI 範圍；垂直黑線 = 0。"
         "若 CI 完全在 0 左側 → Sharpe 顯著為負。"
@@ -386,7 +386,7 @@ with right:
         margin={"l": 60, "r": 20, "t": 20, "b": 60},
         showlegend=False,
     )
-    st.plotly_chart(fig_perm, use_container_width=True)
+    st.plotly_chart(fig_perm, width="stretch")
 
     st.caption(
         f"**p-value = {p_value:.4f}** = `(n_extreme + 1) / (1000 + 1)`（Phipson & Smyth 2010 unbiased）。"
@@ -457,7 +457,7 @@ fig_cost.update_layout(
     xaxis_tickangle=-15,
 )
 
-st.plotly_chart(fig_cost, use_container_width=True)
+st.plotly_chart(fig_cost, width="stretch")
 
 # Δ Sharpe 表
 delta_df = cost_df[
@@ -477,7 +477,7 @@ st.dataframe(
             "|Δ|": "{:.4f}",
         }
     ),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
 )
 
@@ -572,7 +572,7 @@ fig_folds.update_layout(
     legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1},
 )
 
-st.plotly_chart(fig_folds, use_container_width=True)
+st.plotly_chart(fig_folds, width="stretch")
 
 st.caption(
     "**讀法**：每行為 1 個 fold（共 15 個）；藍條 = 252 日 train 期、紅條 = 63 日 disjoint OOS test 期。"
