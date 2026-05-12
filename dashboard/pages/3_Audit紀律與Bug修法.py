@@ -39,8 +39,8 @@ st.markdown(
     將 commit + diff + test result 整理成 review prompt 送外部審查，
     主動找 silent bug、edge case、數學錯誤、單位混淆等問題。
 
-    Phase 1 經 14 輪 R12.0 ~ R12.13 連續 review chain（2026-04-25 ~ 2026-05-02），全部 P0/P1 patches closed；
-    2026-05-05 加碼一輪外部 review 抓到 `agg_max_drawdown` silent bug（見 Section 3.3 deep dive），
+    Phase 1 經 R12.0 ~ R12.13 共 14 輪連續 review chain，全部 P0/P1 patches closed；
+    後續加碼一輪外部 review 抓到 `agg_max_drawdown` silent bug（見 Section 3.3 deep dive），
     1 行修法 + 2 條 regression test 收口。
 
     這個機制比單獨靠自我 review 多一層獨立驗證 — reviewer 看 portfolio 應該關注的不只「我寫了什麼」，
@@ -48,97 +48,48 @@ st.markdown(
     """
 )
 
-# Audit rounds summary table
+# Audit rounds summary table（只列 round + 修法主題，不列數量 / 日期）
 audit_rounds = [
-    (
-        "R12.0",
-        "2026-04-29",
-        4,
-        "permutation 改 sign-flip / walk-forward step disjoint / TAIFEX tax 10 bps",
-    ),
-    ("R12.1", "2026-04-30", 4, "Bootstrap CI / Deflated Sharpe / Calmar / cost ablation 加上"),
-    ("R12.2", "2026-04-30", 1, "rejected_reasons accumulator per-fold snapshot"),
-    ("R12.3", "2026-05-01", 1, "5yr surface coverage 100% gate（1227 shards）"),
-    ("R12.4", "2026-05-01", 2, "_extract_rejected_reasons unwrap depth (16) + cycle safe"),
-    (
-        "R12.5",
-        "2026-05-01",
-        1,
-        "n_fallback_settle_3rd audit metric 區分 surface degraded vs direct",
-    ),
-    ("R12.6", "2026-05-01", 2, "PIT correctness sweeps / FillModel side-specific NaN guards"),
-    (
-        "R12.7",
-        "2026-05-02",
-        1,
-        "Mark policy hybrid: strict_mid → settle_fallback → surface_fallback",
-    ),
-    ("R12.8", "2026-05-02", 1, "engine `cum_pnl = realised + unrealised` invariant"),
-    ("R12.9", "2026-05-02", 2, "TAIFEX schema 3-way drift detection / Big5 magic-bytes guard"),
-    ("R12.10", "2026-05-02", 1, "HMM convergence warning tracking（792 warns over 5yr backtest）"),
-    ("R12.11", "2026-05-02", 1, "Test baseline 463 → 465（+2 regression for next-round fix）"),
-    (
-        "R12.12",
-        "2026-05-02",
-        1,
-        "audit_doc_drift.py automated gate（stale audit refs / absolute claim）",
-    ),
-    ("R12.13", "2026-05-02", 1, "Phase 1 chain 收口；Week 7 hedged IC + Quick A 驗證"),
-    ("2026-05-05", "2026-05-05", 1, "agg_max_drawdown silent bug（Section 3.3 deep dive）"),
+    ("R12.0", "permutation 改 sign-flip / walk-forward step disjoint / TAIFEX tax 10 bps"),
+    ("R12.1", "Bootstrap CI / Deflated Sharpe / Calmar / cost ablation 加上"),
+    ("R12.2", "rejected_reasons accumulator per-fold snapshot"),
+    ("R12.3", "5yr surface coverage 100% gate（1227 shards）"),
+    ("R12.4", "_extract_rejected_reasons unwrap depth (16) + cycle safe"),
+    ("R12.5", "n_fallback_settle_3rd audit metric 區分 surface degraded vs direct"),
+    ("R12.6", "PIT correctness sweeps / FillModel side-specific NaN guards"),
+    ("R12.7", "Mark policy hybrid: strict_mid → settle_fallback → surface_fallback"),
+    ("R12.8", "engine `cum_pnl = realised + unrealised` invariant"),
+    ("R12.9", "TAIFEX schema 3-way drift detection / Big5 magic-bytes guard"),
+    ("R12.10", "HMM convergence warning tracking（792 warns over 5yr backtest）"),
+    ("R12.11", "Test baseline 463 → 465（+2 regression for next-round fix）"),
+    ("R12.12", "audit_doc_drift.py automated gate（stale audit refs / absolute claim）"),
+    ("R12.13", "Phase 1 chain 收口；Week 7 hedged IC + Quick A 驗證"),
+    ("加碼一輪", "agg_max_drawdown silent bug（Section 3.3 deep dive）"),
 ]
 
-audit_df = pd.DataFrame(audit_rounds, columns=["Round", "Date", "P fixes", "Main fix categories"])
+audit_df = pd.DataFrame(audit_rounds, columns=["Round", "Main fix categories"])
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 with col1:
-    st.metric("Audit rounds", "14 + 1", help="R12.0 ~ R12.13 chain + 2026-05-05 加碼")
+    st.metric("Review rounds", "14 + 1", help="R12.0 ~ R12.13 chain + 加碼一輪")
 with col2:
     st.metric(
-        "Total P fixes closed",
-        f"{int(audit_df['P fixes'].sum())}",
-        help="P0 (critical) + P1 (must-fix) + P2 (caveat)",
+        "Patches closed",
+        "all P0 / P1",
+        delta="全部 must-fix 問題收口",
+        delta_color="off",
+        help="P0 = critical / P1 = must-fix；每輪 review 提出的 P0/P1 全數修復後才 close 該輪",
     )
-with col3:
-    st.metric("Days span", "2026-04-29 ~ 2026-05-05", help="Phase 1 audit chain 7 day span")
 
 st.dataframe(
-    audit_df.style.format({"P fixes": "{:.0f}"}),
+    audit_df,
     use_container_width=True,
     hide_index=True,
 )
 
-# Plotly timeline / cumulative fix count
-audit_df["Date_dt"] = pd.to_datetime(audit_df["Date"])
-audit_df = audit_df.sort_values("Date_dt").reset_index(drop=True)
-audit_df["cum_fixes"] = audit_df["P fixes"].cumsum()
-
-fig_timeline = go.Figure()
-fig_timeline.add_trace(
-    go.Scatter(
-        x=audit_df["Date_dt"],
-        y=audit_df["cum_fixes"],
-        mode="lines+markers",
-        line={"width": 3, "color": "#1f77b4"},
-        marker={"size": 12, "color": "#1f77b4"},
-        text=audit_df["Round"],
-        hovertemplate=("<b>%{text}</b><br>%{x|%Y-%m-%d}<br>Cumulative fixes: %{y}<extra></extra>"),
-        name="Cumulative P fixes",
-    )
-)
-fig_timeline.update_layout(
-    xaxis_title="Date",
-    yaxis_title="Cumulative P fixes closed",
-    title="Audit chain 累積 P fix 數",
-    height=400,
-    margin={"l": 60, "r": 20, "t": 50, "b": 60},
-    showlegend=False,
-)
-
-st.plotly_chart(fig_timeline, use_container_width=True)
-
 st.caption(
-    "Review prompt 模板（每輪 milestone 重寫）封裝 commit / diff / test result，外部 reviewer 可 1-click 產出 P0/P1/P2 fix list。"
-    "本 repo 紀律是收到 P fix 後**先 e2e regression test 再 commit**（避 silent bug 二次潛入）。"
+    "Review prompt 模板（每輪 milestone 重寫）封裝 commit / diff / test result，外部 reviewer 1-click 產出 fix list。"
+    "本 repo 紀律是收到 fix list 後**先 e2e regression test 再 commit**（避 silent bug 二次潛入）。"
 )
 
 st.divider()
@@ -164,7 +115,7 @@ st.markdown(
     """
 )
 
-# Hardcoded latest hard gate run（最後一次正式 verification, 2026-05-08）
+# Hardcoded latest hard gate run（最後一次正式 verification 結果）
 gate_results = [
     {
         "Gate": "ruff check src tests config scripts",
@@ -221,7 +172,7 @@ with cols[1]:
 with cols[2]:
     st.metric("Source files", "98", delta="all type-checked", delta_color="off")
 with cols[3]:
-    st.metric("Latest run", "2026-05-08", delta="conda options env", delta_color="off")
+    st.metric("Run 環境", "conda options", delta="Python 3.12 / conda-forge", delta_color="off")
 
 st.caption(
     "本 dashboard 頁載入時不重跑 hard gate（避免互動延遲）；"
@@ -238,7 +189,7 @@ st.header("3.3 Critical Bug Catch: `agg_max_drawdown` silent metric inflation")
 
 st.markdown(
     """
-    **2026-05-05 external review 抓到 `walk_forward._aggregate_folds` 的口徑 bug**：
+    **External review 抓到 `walk_forward._aggregate_folds` 的口徑 bug**：
     把 daily PnL 直接傳入 `metrics.max_drawdown`，而 function contract 明定要 cumulative PnL。
     結果是所有 6 個 scenario 的 `agg_max_drawdown` 報表數字被 1.3 ~ 4.2 倍低估。
 
@@ -414,7 +365,7 @@ st.markdown(
 )
 
 st.code(
-    """# 重算驗證（inline Python，2026-05-05）
+    """# 重算驗證（inline Python）
 import pandas as pd
 INIT_CAP = 1_000_000.0
 
@@ -549,7 +500,7 @@ st.markdown(
     script ~38 分鐘 → 文件同步更新。Senior engineering 紀律：寫 caller 前先看 callee docstring；寫 helper 前先想
     contract violation 的 attack vector。
 
-    **5. External review chain 真的會抓到這種 bug。** 前 14 輪沒抓到 → 第 15 輪外加（2026-05-05）抓到。
+    **5. External review chain 真的會抓到這種 bug。** 前 14 輪沒抓到 → 第 15 輪加碼 review 抓到。
     Reviewer 看 portfolio 重點是「歡迎被攻破」的態度，不是「我從沒犯錯」的假象。
     """
 )

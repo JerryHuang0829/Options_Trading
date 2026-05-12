@@ -2,6 +2,7 @@
 
 台灣期交所 TAIFEX TXO（台指選擇權）系統化策略研究框架，以 Iron Condor（鐵兀鷹）與 Vertical Spread（垂直價差）為主，透過 5 年真實市場資料的 walk-forward（滾動前進）回測進行驗證。
 
+[![CI](https://github.com/JerryHuang0829/Options_Trading/actions/workflows/ci.yml/badge.svg)](https://github.com/JerryHuang0829/Options_Trading/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Tests](https://img.shields.io/badge/tests-465%20passed-brightgreen)
 ![Type Check](https://img.shields.io/badge/mypy-passing-brightgreen)
@@ -19,6 +20,28 @@
 - **Walk-forward 回測引擎** — 252 日 train（訓練）/ 63 日 disjoint quarterly OOS（不重疊季度樣本外）folds。6 scenario =（Iron Condor + Vertical）×（vanilla（純策略）+ IV percentile gate（IV 百分位 gate）+ HMM 2-state regime gate（2 狀態 HMM 機制 gate））。嚴格 daily loop（每日迴圈）+ point-in-time（PIT，當下時點）正確性 — strategy factory 只看到 train 期 returns。
 
 - **Pro 量化統計工具鏈** — Bootstrap percentile CI（百分位信賴區間）、sign-flip permutation test（符號翻轉排列檢定，Politis & Romano 2010）、Deflated Sharpe Ratio（去膨脹 Sharpe，López-de-Prado 2014）、Calmar ratio。Retail（散戶）成本模型（手續費 NT$12 + 期交稅 10 bps + 滑價 15 bps）+ worst-side fill（最差側成交，賣方 fill at bid、買方 fill at ask）。
+
+## 結果與結論（Phase 1）
+
+5 年（2021-04 → 2026-04，1227 個交易日）真實 walk-forward 回測，6 scenario × 15 個 disjoint quarterly OOS folds，**全部 aggregate Sharpe < 0**：
+
+| Scenario | Agg Sharpe | Max DD | Trades / Folds |
+|---|---|---|---|
+| Iron Condor (vanilla) | −2.70 | −2.8% | 5 / 15 |
+| Iron Condor (IV percentile gate) | −2.68 | −2.4% | 4 / 15 |
+| Iron Condor (HMM 2-state regime gate) | 0.0 | — | **0** / 15（regime gate 幾乎全程 close） |
+| Vertical (vanilla) | −2.15 | −6.9% | 12 / 15 |
+| Vertical (IV percentile gate) | −2.12 | −5.4% | 10 / 15 |
+| Vertical (HMM 2-state regime gate) | −2.86 | −1.0% | 1 / 15 |
+
+**Phase 1 出口條件「OOS Sharpe > 1」FAIL** → Iron Condor / Vertical short-premium 假設在 5 年 OOS 上證偽，不啟動 paper trading。
+
+兩個刻意做的紀律約束，避免把「失敗」洗成「成功」：
+
+- **排除顯而易見的藉口**：把零售成本模型整個關掉（`--no-cost-model`）重跑，各 scenario Sharpe `|Δ| ≤ 0.016` —— 不是手續費 / 期交稅 / 滑價壓死的，是策略本身在這段 regime（含 2022 熊市與 2025 關稅震盪，short premium 易爆損）就沒有 edge。
+- **不 data-snoop**：明知 5 年全 negative 後，不反向 sweep `short_delta` / `wing_delta` / DTE 去湊正 Sharpe —— 那是 lookback bias，不是研究。
+
+> 假設被證偽是有效的研究產出，不是「待修的 bug」。同一套工程基礎設施 —— 自寫定價核心、8 年資料管線、vol surface、walk-forward + Pro 統計工具鏈、4 件 hard gate、external review chain —— 都可重用：Phase 2 換策略類別（calendar spread / long-premium overlay / 或 cross-asset factor model），重跑 fresh OOS，目標仍是驗證通過後走向小額 paper → live。
 
 ## 快速開始
 

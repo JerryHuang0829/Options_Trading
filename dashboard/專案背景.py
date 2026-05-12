@@ -71,7 +71,7 @@ with col4:
         value="14+1",
         delta="輪 closed",
         delta_color="off",
-        help="R12.0 ~ R12.13 連 14 輪 review chain closed + 2026-05-05 加碼一輪抓到並修復 silent bug",
+        help="R12.0 ~ R12.13 連 14 輪 review chain closed + 加碼一輪抓到並修復 silent bug",
     )
 
 st.divider()
@@ -242,7 +242,7 @@ with nav_cols[2]:
     st.page_link("pages/3_Audit紀律與Bug修法.py", label="Page 3 — Audit 紀律", icon="🛡️")
 
 st.caption(
-    "Last updated: 2026-05-08 · "
     "GitHub: [JerryHuang0829/Options_Trading](https://github.com/JerryHuang0829/Options_Trading) · "
-    "Tests: 465 passed, 2 skipped"
+    "Tests: 465 passed, 2 skipped · "
+    "Phase 1 完工"
 )

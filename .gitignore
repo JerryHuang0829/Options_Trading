@@ -35,10 +35,14 @@ tmp[0-9a-z]*/
 tmp[0-9a-z]*
 
 # Internal working memory + Claude Code skills — exclude from public GitHub
-# (showcase 只保 README.md；其他 .md 視為 internal working memory)
+# (showcase 保 README.md + docs/ 技術文件；其他 .md 視為 internal working memory)
 .claude/
 *.md
 !README.md
+# Published technical docs (math derivation / audit reference / TAIFEX data spec)
+!docs/bsm_derivation.md
+!docs/options_math_audit.md
+!docs/taifex_data_source_spec.md
 
 # OS
 .DS_Store
