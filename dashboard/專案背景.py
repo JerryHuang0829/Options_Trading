@@ -92,6 +92,37 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
+# 專案規格（30 秒看懂 scope）
+# ---------------------------------------------------------------------------
+
+st.subheader("專案規格")
+
+spec_l, spec_r = st.columns(2)
+with spec_l:
+    st.markdown(
+        """
+        - **規模 baseline**：零售 NT$ 1,000,000
+        - **標的**：TAIFEX TXO（台指選擇權，月選）
+        - **策略型態**：賣方溢價 — Iron Condor（4 腳）+ Vertical Spread（bull put / bear call）；**永不 naked**
+        - **基準問題**：5 年真實 OOS 下能否穩定賺錢（Sharpe > 1）
+        - **資料源**：TAIFEX 每日選擇權結算行情（Big5 ZIP）；Shioaji broker 抽象層（Phase 2）
+        """
+    )
+with spec_r:
+    st.markdown(
+        """
+        - **回測樣本**：walk-forward OOS 2021-04 ~ 2026-04（資料管線涵蓋 2018-04 起，8 年 / 1963 交易日）
+        - **Walk-forward 設定**：252 日 rolling train / 63 日 disjoint quarterly OOS / step = 63（OOS 不重疊）→ 15 folds
+        - **定價核心**：自寫 BSM-Merton（含連續股利率 `q`）+ `py_vollib` 交叉驗證至 1e-8
+        - **Mark-to-market**：SVI / SABR vol surface model-price fallback（解 60% bid/ask 缺值）
+        - **成本模型**：手續費 NT$12 + 期交稅 10 bps + 滑價 15 bps + worst-side fill
+        - **回測引擎**：自寫 daily-loop backtest engine（PIT-safe）
+        """
+    )
+
+st.divider()
+
+# ---------------------------------------------------------------------------
 # 路線圖時間軸（Plotly horizontal timeline）
 # ---------------------------------------------------------------------------
 
